@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:09 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/04 13:44:44 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/04 16:40:20 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ static t_bool	usage(const char *str)
 {
 	ft_putstr_fd(str, 2);
 	ft_putstr_fd("\nUsage: ./philo <number_of_philosophers> ", 2);
-	ft_putstr_fd("<time_to_die> <time_to_eat> <time_to_sleep> ", 2);
-	ft_putstr_fd("[(optional) number_of_times_each_philosopher_must_eat]\n", 2);
+	ft_putstr_fd("<time_to_die> <time_to_eat> <time_to_sleep> [(", 2);
+	ft_putstr_fd("optional) number_of_times_each_philosopher_must_eat]\n", 2);
 	return (FALSE);
 }
 
@@ -55,13 +55,28 @@ static t_bool	init_mutexes(t_table *table)
 	return (TRUE);
 }
 
-static t_bool	init_forks(t_table *table)
+static t_bool	init_arrays(t_table *table)
 {
-	table->forks = (t_bool *)malloc(sizeof(t_bool) * table->philos);
+	size_t	i;
+
+	table->forks = (t_bool *)malloc(sizeof(t_bool) * table->nb_philos);
 	if (table->forks == NULL)
 	{
 		pthread_mutex_destroy(&(table->fork_lock));
 		pthread_mutex_destroy(&(table->talk_lock));
+		free(table);
+		return (FALSE);
+	}
+	i = 0;
+	while (i < table->nb_philos)
+		table->forks[i++] = TRUE;
+	table->philos = (pthread_t *)malloc(sizeof(pthread_t) *
+		(table->nb_philos + 1));
+	if (table->philos == NULL)
+	{
+		pthread_mutex_destroy(&(table->fork_lock));
+		pthread_mutex_destroy(&(table->talk_lock));
+		free(table->forks);
 		free(table);
 		return (FALSE);
 	}
@@ -75,7 +90,7 @@ t_table	*init_table(char **argv)
 	table = (t_table *)malloc(sizeof(t_table));
 	if (table == NULL)
 		return (NULL);
-	table->philos = ft_atoi(argv[1]);
+	table->nb_philos = ft_atoi(argv[1]);
 	table->tt_die = ft_atoi(argv[2]);
 	table->tt_eat = ft_atoi(argv[3]);
 	table->tt_sleep = ft_atoi(argv[4]);
@@ -89,7 +104,7 @@ t_table	*init_table(char **argv)
 		free(table);
 		return (NULL);
 	}
-	if (init_forks(table) == FALSE)
+	if (init_arrays(table) == FALSE)
 		return (NULL);
 	return (table);
 }

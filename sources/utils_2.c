@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:07:05 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/04 13:07:47 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/04 16:29:02 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,4 +33,21 @@ t_bool	ft_checkposint(char *nb)
 	}
 	else
 		return (TRUE);
+}
+
+int		ft_clock(void)
+{
+	static int	start = 0;
+	struct timeval	tv;
+
+	if (gettimeofday(&tv, NULL) == -1)
+		return (-1);
+	if (start == 0)
+		start = (tv.tv_usec / 1000) + (tv.tv_sec * 1000);
+	return ((tv.tv_usec /1000) + (tv.tv_sec * 1000) - start);
+}
+
+void	ft_blabla(t_philo info, const char *str)
+{	
+	printf("%-10d %4lu %s", ft_clock(), info.index, str);
 }
