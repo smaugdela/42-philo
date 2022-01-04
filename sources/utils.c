@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:43:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/03 17:11:13 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/04 13:46:24 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,26 @@ void	ft_putstr_fd(const char *str, int fd)
 	i = 0;
 	if (str == NULL || fd < 0)
 		return ;
-	while(str[i])
+	while (str[i])
 	{
 		write(fd, str + i, 1);
 		++i;
 	}
 }
 
-t_bool	ft_is_str_digits(const char* str)
+size_t	ft_strlen(const char *str)
+{
+	size_t	i;
+
+	if (str == NULL)
+		return (0);
+	i = 0;
+	while (str[i])
+		++i;
+	return (i);
+}
+
+t_bool	ft_is_str_digits(const char *str)
 {
 	size_t	i;
 

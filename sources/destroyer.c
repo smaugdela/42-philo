@@ -1,28 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   destroyer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/04 13:45:09 by smagdela         ###   ########.fr       */
+/*   Created: 2022/01/04 13:17:51 by smagdela          #+#    #+#             */
+/*   Updated: 2022/01/04 13:45:41 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	main(int argc, char **argv)
+int	destroyer(t_table *table)
 {
-	t_table	*table_ronde;
-
-	if (check_args(argc, argv) == FALSE)
-		return (42);
-	table_ronde = init_table(argv);
-	if (table_ronde == NULL)
-		return (42);
-	printf("philos = %lu\ndie = %lu\neat = %lu\nsleep = %lu\nfull = %lu\n",
-		table_ronde->philos, table_ronde->tt_die, table_ronde->tt_eat,
-		table_ronde->tt_sleep, table_ronde->full);
-	return (destroyer(table_ronde));
+	pthread_mutex_destroy(&(table->fork_lock));
+	pthread_mutex_destroy(&(table->talk_lock));
+	free(table->forks);
+	free(table);
+	return (0);
 }

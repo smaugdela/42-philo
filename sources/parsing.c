@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:09 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/03 17:33:04 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/04 13:44:44 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,49 +15,23 @@
 static t_bool	usage(const char *str)
 {
 	ft_putstr_fd(str, 2);
-	ft_putstr_fd("\nUsage: ./philo <number_of_philosophers> ", 2); 
-	ft_putstr_fd("<time_to_die> <time_to_eat> <time_to_sleep>", 2); 
-	ft_putstr_fd("[(optional)number_of_times_each_philosopher_must_eat]\n", 2);
+	ft_putstr_fd("\nUsage: ./philo <number_of_philosophers> ", 2);
+	ft_putstr_fd("<time_to_die> <time_to_eat> <time_to_sleep> ", 2);
+	ft_putstr_fd("[(optional) number_of_times_each_philosopher_must_eat]\n", 2);
 	return (FALSE);
 }
 
-static t_bool	ft_checkint(char *nb)
-{
-	char	*int_extremum;
-	int		i;
-
-	i = 0;
-	if (nb[0] == '-')
-	{
-		int_extremum = "-2147483648";
-		i = 1;
-	}
-	else
-		int_extremum = "2147483647";
-	if (ft_strlen(nb) >= ft_strlen(int_extremum))
-	{
-		while (nb[i])
-		{
-			if (nb[i] > int_extremum[i] || !ft_isdigit(nb[i]))
-				return (FALSE);
-			++i;
-		}
-		return (TRUE);
-	}
-	else
-		return (TRUE);
-}
-
-t_bool  check_args(int argc, char **argv)
+t_bool	check_args(int argc, char **argv)
 {
 	int	index;
 
 	if (argc < 5 || argc > 6)
 		return (usage("Bad argument number"));
 	index = 1;
-	while(argv[index] != NULL)
+	while (argv[index] != NULL)
 	{
-		if (ft_is_str_digits(argv[index]) == FALSE || ft_checkint(argv[index]) == FALSE)
+		if (ft_is_str_digits(argv[index]) == FALSE
+			|| ft_checkposint(argv[index]) == FALSE)
 			return (usage("Bad argument type (only positive integers)"));
 		++index;
 	}
@@ -81,9 +55,22 @@ static t_bool	init_mutexes(t_table *table)
 	return (TRUE);
 }
 
+static t_bool	init_forks(t_table *table)
+{
+	table->forks = (t_bool *)malloc(sizeof(t_bool) * table->philos);
+	if (table->forks == NULL)
+	{
+		pthread_mutex_destroy(&(table->fork_lock));
+		pthread_mutex_destroy(&(table->talk_lock));
+		free(table);
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
 t_table	*init_table(char **argv)
 {
-	t_table 		*table;
+	t_table	*table;
 
 	table = (t_table *)malloc(sizeof(t_table));
 	if (table == NULL)
@@ -102,11 +89,7 @@ t_table	*init_table(char **argv)
 		free(table);
 		return (NULL);
 	}
-	table->forks = (t_bool *)malloc(sizeof(t_bool) * table->philos);
-	if (table->forks == NULL)
-	{
-		free(table);
-		return (NULL);	
-	}
+	if (init_forks(table) == FALSE)
+		return (NULL);
 	return (table);
 }
