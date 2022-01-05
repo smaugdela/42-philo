@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:09 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/04 16:40:20 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/05 12:47:07 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,11 @@ t_bool	check_args(int argc, char **argv)
 	return (TRUE);
 }
 
-static t_bool	init_mutexes(t_table *table)
+static t_bool	init_mutexes(t_data *table)
 {
 	pthread_mutex_t	lock_1;
 	pthread_mutex_t	lock_2;
+	pthread_mutex_t	lock_3;
 
 	if (pthread_mutex_init(&lock_1, NULL) != 0)
 		return (FALSE);
@@ -50,61 +51,30 @@ static t_bool	init_mutexes(t_table *table)
 		pthread_mutex_destroy(&lock_1);
 		return (FALSE);
 	}
-	table->fork_lock = lock_1;
-	table->talk_lock = lock_2;
+	if (pthread_mutex_init(&lock_3, NULL) != 0)
+	{
+		pthread_mutex_destroy(&lock_1);
+		pthread_mutex_destroy(&lock_2);
+		return (FALSE);
+	}
+	table->talk_lock = lock_1;
+	table->death_lock = lock_2;
+	table->full_lock = lock_3;
 	return (TRUE);
 }
 
-static t_bool	init_arrays(t_table *table)
+t_bool	init_table(char **argv, t_data *table)
 {
-	size_t	i;
-
-	table->forks = (t_bool *)malloc(sizeof(t_bool) * table->nb_philos);
-	if (table->forks == NULL)
-	{
-		pthread_mutex_destroy(&(table->fork_lock));
-		pthread_mutex_destroy(&(table->talk_lock));
-		free(table);
-		return (FALSE);
-	}
-	i = 0;
-	while (i < table->nb_philos)
-		table->forks[i++] = TRUE;
-	table->philos = (pthread_t *)malloc(sizeof(pthread_t) *
-		(table->nb_philos + 1));
-	if (table->philos == NULL)
-	{
-		pthread_mutex_destroy(&(table->fork_lock));
-		pthread_mutex_destroy(&(table->talk_lock));
-		free(table->forks);
-		free(table);
-		return (FALSE);
-	}
-	return (TRUE);
-}
-
-t_table	*init_table(char **argv)
-{
-	t_table	*table;
-
-	table = (t_table *)malloc(sizeof(t_table));
-	if (table == NULL)
-		return (NULL);
 	table->nb_philos = ft_atoi(argv[1]);
+	table->nb_philos_full = 0;
 	table->tt_die = ft_atoi(argv[2]);
 	table->tt_eat = ft_atoi(argv[3]);
 	table->tt_sleep = ft_atoi(argv[4]);
 	if (argv[5] != NULL)
 		table->full = ft_atoi(argv[5]);
 	else
-		table->full = 0;
+		table->full = -1;
 	table->death = FALSE;
-	if (init_mutexes(table) == FALSE)
-	{
-		free(table);
-		return (NULL);
-	}
-	if (init_arrays(table) == FALSE)
-		return (NULL);
-	return (table);
+	table->clock_start = ft_clock();
+	return (init_mutexes(table));
 }

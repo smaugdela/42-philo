@@ -6,24 +6,36 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:53:55 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/04 17:11:08 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/05 12:53:05 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-t_bool	philo_birth(int	index, t_table *table)
+static t_bool	philo_birth(t_philo philo)
 {
-	pthread_t	philo;
-	t_philo		info;
+	pthread_t	thread_id;
 
-	info.index = index;
-	info.table = table;
-	if (pthread_create(&philo, NULL, &ft_philo, &info) != 0)
+	if (pthread_create(&thread_id, NULL, &ft_philo, &philo) != 0)
 	{
-		table->death = TRUE;
+		pthread_mutex_lock(&philo.table->death_lock);
+		philo.table->death = TRUE;
+		pthread_mutex_unlock(&philo.table->death_lock);
 		return (FALSE);
 	}
-	table->philos[index - 1] = philo;
 	return (TRUE);
+}
+
+t_bool launch(t_philo *philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < philos->table->nb_philos)
+	{
+		philo_birth(philos[i]);
+		++i;
+	}
+	return(FALSE);
+	return(TRUE);
 }
