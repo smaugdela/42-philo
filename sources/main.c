@@ -6,20 +6,29 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/05 12:55:20 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/06 17:32:54 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static int	wait_end(t_data table)
+static int	wait_end(t_philo *philos)
 {
-	while(table.death == FALSE && table.nb_philos_full < table.nb_philos)
+	size_t	i;
+
+	i = 0;
+	while(philos->table->death == FALSE &&
+		philos->table->nb_philos_full < philos->table->nb_philos)
 	{
 	}
-	if (table.death == TRUE)
+	while (i < philos->table->nb_philos)
+	{
+		pthread_join(philos[i].thread_id, NULL);
+		i++;
+	}
+	if (philos->table->death == TRUE)
 		return (DEAD);
-	else if (table.nb_philos_full == table.nb_philos)
+	else if (philos->table->nb_philos_full == philos->table->nb_philos)
 		return (FULL);
 	else
 		return (42);
@@ -48,7 +57,7 @@ int	main(int argc, char **argv)
 		free(philos);
 		return (42);
 	}
-	ret = wait_end(table);
+	ret = wait_end(philos);
 	free(philos);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:09 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/06 12:09:09 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/06 17:02:52 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,23 +40,32 @@ t_bool	check_args(int argc, char **argv)
 
 static t_bool	init_mutexes(t_data *table)
 {
+	pthread_mutex_t	lock_0;
 	pthread_mutex_t	lock_1;
 	pthread_mutex_t	lock_2;
 	pthread_mutex_t	lock_3;
 
-	if (pthread_mutex_init(&lock_1, NULL) != 0)
+	if (pthread_mutex_init(&lock_0, NULL) != 0)
 		return (FALSE);
+	if (pthread_mutex_init(&lock_1, NULL) != 0)
+	{
+		pthread_mutex_destroy(&lock_0);
+		return (FALSE);
+	}
 	if (pthread_mutex_init(&lock_2, NULL) != 0)
 	{
+		pthread_mutex_destroy(&lock_0);
 		pthread_mutex_destroy(&lock_1);
 		return (FALSE);
 	}
 	if (pthread_mutex_init(&lock_3, NULL) != 0)
 	{
+		pthread_mutex_destroy(&lock_0);
 		pthread_mutex_destroy(&lock_1);
 		pthread_mutex_destroy(&lock_2);
 		return (FALSE);
 	}
+	table->clock_lock = lock_0;
 	table->talk_lock = lock_1;
 	table->death_lock = lock_2;
 	table->full_lock = lock_3;
