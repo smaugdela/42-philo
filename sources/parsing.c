@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:09 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/05 12:47:07 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/06 12:09:09 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,5 @@ t_bool	init_table(char **argv, t_data *table)
 	else
 		table->full = -1;
 	table->death = FALSE;
-	table->clock_start = ft_clock();
 	return (init_mutexes(table));
 }

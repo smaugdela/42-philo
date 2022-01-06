@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:12 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/05 12:48:49 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/06 12:57:58 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ typedef struct s_data
 typedef struct s_philo
 {
 	size_t			index;
+	pthread_t		*thread_id;
+	pthread_t		*faucheuse_id;
 	pthread_mutex_t	left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*table;
@@ -63,6 +65,7 @@ int				ft_isdigit(int c);
 t_bool			ft_is_str_digits(const char *str);
 t_bool			ft_checkposint(char *nb);
 uint64_t		ft_clock(void);
+void			ft_blabla(size_t index, const char *str);
 
 /* Parsing */
 t_bool	check_args(int argc, char **argv);

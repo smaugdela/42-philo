@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:07:05 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/05 12:38:04 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/06 12:30:12 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,14 @@ uint64_t	ft_clock(void)
 
 	if (gettimeofday(&tv, NULL) == -1)
 	{
-		ft_putstr_fd("Error: gettimeofday error.", 2);
+		ft_putstr_fd("Error: gettimeofday error.\n", 2);
 		return (-1);
 	}
 	return ((tv.tv_usec /1000) + (tv.tv_sec * 1000));
 }
-/*
-void	ft_blabla(t_table table, const char *str)
+
+void	ft_blabla(size_t index, const char *str)
 {
-	pthread_mutex_lock(&(table->talk_lock));
-	printf("%-10d %4lu %s", ft_clock(), info.index, str);
-	pthread_mutex_unlock(&(table->talk_lock));
+	printf("%-10d %4lu %s", ft_clock(), index, str);
 }
-*/
+
