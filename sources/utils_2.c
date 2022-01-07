@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:07:05 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/06 17:07:27 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/07 12:35:24 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,10 @@ uint64_t	ft_clock(void)
 void	ft_blabla(t_philo *info, const char *str)
 {
 	pthread_mutex_lock(&info->table->talk_lock);
-	printf("%-10lu %4lu %s\n",
+	pthread_mutex_lock(&info->table->clock_lock);
+	printf("%-6lu ms: %4lu %s\n",
 		ft_clock() - info->table->clock_start,
 		info->index, str);
+	pthread_mutex_unlock(&info->table->clock_lock);
 	pthread_mutex_unlock(&info->table->talk_lock);
 }

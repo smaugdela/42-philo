@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:53:55 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/06 17:07:23 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/07 11:56:30 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ t_bool launch(t_philo *philos)
 	if (philos->table->nb_philos <= 1)
 		return (TRUE);
 	i = 1;
+	usleep(philos->table->tt_eat * 500);
 	while (i < philos->table->nb_philos)
 	{
 		if (philo_birth(&philos[i]) == FALSE)
