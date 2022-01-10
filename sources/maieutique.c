@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:53:55 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/10 12:05:33 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/10 14:17:29 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static t_bool	philo_birth(t_philo *philo)
 {
 	pthread_t	thread;
 
-	printf("Philosopher %lu is born\n", philo->index);
+//	printf("Philosopher %lu is born\n", philo->index);
 	if (pthread_create(&thread, NULL, &ft_philo, philo) != 0)
 	{
 		pthread_mutex_lock(&philo->table->death_lock);
@@ -45,7 +45,7 @@ t_bool launch(t_philo *philos)
 	if (philos->table->nb_philos <= 1)
 		return (TRUE);
 	i = 1;
-	usleep(ft_min(philos->table->tt_die, philos->table->tt_eat) * 500);
+	usleep(/* ft_min(philos->table->tt_die, philos->table->tt_eat) * */ 500);
 	while (i < philos->table->nb_philos)
 	{
 		if (philo_birth(&philos[i]) == FALSE)
