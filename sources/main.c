@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/07 12:53:38 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/10 12:22:40 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static int	wait_end(t_philo *philos)
 	while (i < philos->table->nb_philos)
 	{
 		pthread_join(philos[i].thread_id, NULL);
-		i++;
+		++i;
 	}
 	if (philos->table->death == TRUE)
 		return (DEAD);
@@ -59,5 +59,5 @@ int	main(int argc, char **argv)
 	}
 	ret = wait_end(philos);
 	free(philos);
-	return (0);
+	return (ret);
 }

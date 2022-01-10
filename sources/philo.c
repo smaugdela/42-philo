@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:35 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/07 12:36:28 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/10 12:21:22 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,28 +58,43 @@ void	*ft_philo(void *info)
 	philo = (t_philo *)info;
 	pthread_create(&thread, NULL, &faucheuse, philo);
 	philo->faucheuse_id = thread;
-	while (philo->state == ALIVE && philo->table->death == FALSE)
+	while (42)
 	{
 		pthread_mutex_lock(&philo->left_fork);
 		if (philo->state != ALIVE || philo->table->death == TRUE)
+		{
+			pthread_mutex_unlock(&philo->left_fork);
 			break ;
-		
+		}
+
 		ft_blabla(philo, "has taken left fork.");
 		if (philo->state != ALIVE || philo->table->death == TRUE)
+		{
+			pthread_mutex_unlock(&philo->left_fork);
 			break ;
+		}
 
 		if (philo->right_fork == NULL)
 		{
 			ft_wait(philo, philo->table->tt_die * 2);
+			pthread_mutex_unlock(&philo->left_fork);
 			break ;
 		}
 		pthread_mutex_lock(philo->right_fork);
 		if (philo->state != ALIVE || philo->table->death == TRUE)
+		{
+			pthread_mutex_unlock(&philo->left_fork);
+			pthread_mutex_unlock(philo->right_fork);
 			break ;
+		}
 
 		ft_blabla(philo, "has taken right fork.");
 		if (philo->state != ALIVE || philo->table->death == TRUE)
+		{
+			pthread_mutex_unlock(&philo->left_fork);
+			pthread_mutex_unlock(philo->right_fork);
 			break ;
+		}
 
 		ft_blabla(philo, "is eating.");
 		pthread_detach(philo->faucheuse_id);
@@ -87,7 +102,11 @@ void	*ft_philo(void *info)
 		pthread_create(&philo->faucheuse_id, NULL, &faucheuse, philo);
 		ft_wait(philo, philo->table->tt_eat);
 		if (philo->state != ALIVE || philo->table->death == TRUE)
+		{
+			pthread_mutex_unlock(&philo->left_fork);
+			pthread_mutex_unlock(philo->right_fork);
 			break ;
+		}
 
 		if (philo->nb_meals == philo->table->full)
 		{
@@ -101,22 +120,28 @@ void	*ft_philo(void *info)
 			break ;
 		}
 
-		pthread_mutex_unlock(&philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
-
 		ft_blabla(philo, "is sleeping.");
 		if (philo->state != ALIVE || philo->table->death == TRUE)
+		{
+			pthread_mutex_unlock(&philo->left_fork);
+			pthread_mutex_unlock(philo->right_fork);
 			break ;
+		}
+		
+		pthread_mutex_unlock(&philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
 
 		ft_wait(philo, philo->table->tt_sleep);
 		if (philo->state != ALIVE || philo->table->death == TRUE)
 			break ;
 
 		ft_blabla(philo, "is thinking.");
+		if (philo->state != ALIVE || philo->table->death == TRUE)
+			break ;
 	}
-	if (philo->state == ALIVE && philo->table->death == TRUE)
-		ft_blabla(philo, "has left.");
-	else if (philo->state == DEAD)
+	if (philo->state != DEAD)
+		pthread_detach(philo->faucheuse_id);
+	if (philo->state == DEAD)
 		ft_blabla(philo, "is dead.");
 	else if (philo->state == FULL)
 		ft_blabla(philo, "is full.");

@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:12 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/06 17:07:24 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/10 12:15:31 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ t_bool			ft_is_str_digits(const char *str);
 t_bool			ft_checkposint(char *nb);
 uint64_t		ft_clock(void);
 void			ft_blabla(t_philo *info, const char *str);
+size_t			ft_min(size_t a, size_t b);
 
 /* Parsing */
 t_bool	check_args(int argc, char **argv);

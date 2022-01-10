@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:07:05 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/07 12:35:24 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/10 12:03:25 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,4 +56,11 @@ void	ft_blabla(t_philo *info, const char *str)
 		info->index, str);
 	pthread_mutex_unlock(&info->table->clock_lock);
 	pthread_mutex_unlock(&info->table->talk_lock);
+}
+
+size_t	ft_min(size_t a, size_t b)
+{
+	if (a < b)
+		return (a);
+	return (b);
 }
