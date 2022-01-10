@@ -6,12 +6,11 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:35 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/10 12:21:22 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/10 19:54:30 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
 
 static void	ft_wait(t_philo *philo, uint64_t time)
 {
@@ -20,8 +19,10 @@ static void	ft_wait(t_philo *philo, uint64_t time)
 	pthread_mutex_lock(&philo->table->clock_lock);
 	tempus_fugit = ft_clock();
 	pthread_mutex_unlock(&philo->table->clock_lock);
+	pthread_mutex_lock(&philo->table->death_lock);
 	while (philo->state == ALIVE && philo->table->death == FALSE)
 	{
+		pthread_mutex_unlock(&philo->table->death_lock);
 		pthread_mutex_lock(&philo->table->clock_lock);
 		if (ft_clock() - tempus_fugit >= time)
 		{
@@ -29,7 +30,9 @@ static void	ft_wait(t_philo *philo, uint64_t time)
 			break ;
 		}
 		pthread_mutex_unlock(&philo->table->clock_lock);
+		pthread_mutex_lock(&philo->table->death_lock);
 	}
+	pthread_mutex_unlock(&philo->table->death_lock);
 }
 
 static void	*faucheuse(void *info)
@@ -40,13 +43,8 @@ static void	*faucheuse(void *info)
 	philo = (t_philo *)info;
 	memento_mori = philo->nb_meals;
 	ft_wait(philo, philo->table->tt_die);
-	if (philo->nb_meals <= memento_mori)
-	{
+	if (philo->nb_meals <= memento_mori && philo->state == ALIVE)
 		philo->state = DEAD;
-		pthread_mutex_lock(&philo->table->death_lock);
-		philo->table->death = TRUE;
-		pthread_mutex_unlock(&philo->table->death_lock);
-	}
 	return (NULL);
 }
 
@@ -139,11 +137,15 @@ void	*ft_philo(void *info)
 		if (philo->state != ALIVE || philo->table->death == TRUE)
 			break ;
 	}
-	if (philo->state != DEAD)
-		pthread_detach(philo->faucheuse_id);
-	if (philo->state == DEAD)
+	pthread_detach(philo->faucheuse_id);
+	if (philo->table->death == FALSE && philo->state == DEAD)
+	{
 		ft_blabla(philo, "is dead.");
+		pthread_mutex_lock(&philo->table->death_lock);
+		philo->table->death = TRUE;
+		pthread_mutex_unlock(&philo->table->death_lock);
+	}
 	else if (philo->state == FULL)
-		ft_blabla(philo, "is full.");
+		ft_blabla(philo, "has finished.");
 	return (philo);
 }
