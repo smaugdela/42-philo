@@ -6,7 +6,7 @@
 #    By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/09 15:00:41 by smagdela          #+#    #+#              #
-#    Updated: 2022/01/11 16:06:28 by smagdela         ###   ########.fr        #
+#    Updated: 2022/01/11 16:43:29 by smagdela         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,12 +53,12 @@ NUKE	=	"\n${RED}     _.-^^---....,,--       \n _--                  --_  \n<    
 all:	${NAME}
 
 ${NAME}:	 ${OBJS}
-	${CC} -pthread ${CFLAGS} ${OBJS} -o ${NAME}
+	${CC} -pthread ${CFLAGS} ${OBJS} -g -o ${NAME}
 	@echo ${WHALE}
 
 ${OBJD}%.o:	${SRCD}%.c
 	mkdir -p ${OBJD}
-	${CC} ${CFLAGS} -c -o $@ -I${INCD} -MMD $<
+	${CC} ${CFLAGS} -c -o $@ -I${INCD} -g -MMD $<
 
 bonus:	${NAME}_bonus
 
