@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/10 19:49:40 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/11 16:03:42 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,19 @@ static int	wait_end(t_philo *philos)
 {
 	size_t	i;
 
-	pthread_mutex_lock(&philos->table->death_lock);
-	pthread_mutex_lock(&philos->table->full_lock);
-	while(philos->table->death == FALSE &&
-		philos->table->nb_philos_full < philos->table->nb_philos)
+	while(42)
 	{
-		pthread_mutex_unlock(&philos->table->full_lock);
-		pthread_mutex_unlock(&philos->table->death_lock);
-		usleep(500);
-		pthread_mutex_lock(&philos->table->full_lock);
 		pthread_mutex_lock(&philos->table->death_lock);
+		pthread_mutex_lock(&philos->table->full_lock);
+		if(philos->table->death == FALSE &&
+			philos->table->nb_philos_full < philos->table->nb_philos)
+			break ;
+		pthread_mutex_unlock(&philos->table->death_lock);
+		pthread_mutex_unlock(&philos->table->full_lock);
+		usleep(500);
 	}
-	pthread_mutex_unlock(&philos->table->full_lock);
 	pthread_mutex_unlock(&philos->table->death_lock);
+	pthread_mutex_unlock(&philos->table->full_lock);
 	i = 0;
 	while (i < philos->table->nb_philos)
 	{

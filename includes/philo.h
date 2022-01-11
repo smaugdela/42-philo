@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:12 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/10 19:27:05 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/11 12:13:50 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ typedef struct s_philo
 	pthread_mutex_t	*right_fork;
 	t_data			*table;
 	int				nb_meals;
+	pthread_mutex_t	state_lock;
 	t_bool			state;
 }	t_philo;
 

@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:35 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/10 19:54:30 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/11 15:53:17 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,8 @@ static void	ft_wait(t_philo *philo, uint64_t time)
 	pthread_mutex_lock(&philo->table->clock_lock);
 	tempus_fugit = ft_clock();
 	pthread_mutex_unlock(&philo->table->clock_lock);
-	pthread_mutex_lock(&philo->table->death_lock);
 	while (philo->state == ALIVE && philo->table->death == FALSE)
 	{
-		pthread_mutex_unlock(&philo->table->death_lock);
 		pthread_mutex_lock(&philo->table->clock_lock);
 		if (ft_clock() - tempus_fugit >= time)
 		{
@@ -30,9 +28,7 @@ static void	ft_wait(t_philo *philo, uint64_t time)
 			break ;
 		}
 		pthread_mutex_unlock(&philo->table->clock_lock);
-		pthread_mutex_lock(&philo->table->death_lock);
 	}
-	pthread_mutex_unlock(&philo->table->death_lock);
 }
 
 static void	*faucheuse(void *info)
@@ -41,11 +37,31 @@ static void	*faucheuse(void *info)
 	int			memento_mori;
 
 	philo = (t_philo *)info;
+	pthread_mutex_lock(&philo->state_lock);
 	memento_mori = philo->nb_meals;
+	pthread_mutex_unlock(&philo->state_lock);
 	ft_wait(philo, philo->table->tt_die);
 	if (philo->nb_meals <= memento_mori && philo->state == ALIVE)
+	{
+		pthread_mutex_lock(&philo->state_lock);
 		philo->state = DEAD;
+		pthread_mutex_unlock(&philo->state_lock);
+	}
 	return (NULL);
+}
+
+static t_bool	check_state(t_philo *philo)
+{
+	t_bool	ret;
+
+	ret = TRUE;
+	pthread_mutex_lock(&philo->table->death_lock);
+	pthread_mutex_lock(&philo->state_lock);
+	if (philo->state != ALIVE || philo->table->death == TRUE)
+		ret = FALSE;
+	pthread_mutex_unlock(&philo->table->death_lock);
+	pthread_mutex_unlock(&philo->state_lock);
+	return (ret);
 }
 
 void	*ft_philo(void *info)
@@ -59,14 +75,14 @@ void	*ft_philo(void *info)
 	while (42)
 	{
 		pthread_mutex_lock(&philo->left_fork);
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 		{
 			pthread_mutex_unlock(&philo->left_fork);
 			break ;
 		}
 
 		ft_blabla(philo, "has taken left fork.");
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 		{
 			pthread_mutex_unlock(&philo->left_fork);
 			break ;
@@ -79,7 +95,7 @@ void	*ft_philo(void *info)
 			break ;
 		}
 		pthread_mutex_lock(philo->right_fork);
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 		{
 			pthread_mutex_unlock(&philo->left_fork);
 			pthread_mutex_unlock(philo->right_fork);
@@ -87,7 +103,7 @@ void	*ft_philo(void *info)
 		}
 
 		ft_blabla(philo, "has taken right fork.");
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 		{
 			pthread_mutex_unlock(&philo->left_fork);
 			pthread_mutex_unlock(philo->right_fork);
@@ -99,7 +115,7 @@ void	*ft_philo(void *info)
 		philo->nb_meals += 1;
 		pthread_create(&philo->faucheuse_id, NULL, &faucheuse, philo);
 		ft_wait(philo, philo->table->tt_eat);
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 		{
 			pthread_mutex_unlock(&philo->left_fork);
 			pthread_mutex_unlock(philo->right_fork);
@@ -119,22 +135,22 @@ void	*ft_philo(void *info)
 		}
 
 		ft_blabla(philo, "is sleeping.");
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 		{
 			pthread_mutex_unlock(&philo->left_fork);
 			pthread_mutex_unlock(philo->right_fork);
 			break ;
 		}
-		
+
 		pthread_mutex_unlock(&philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
 
 		ft_wait(philo, philo->table->tt_sleep);
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 			break ;
 
 		ft_blabla(philo, "is thinking.");
-		if (philo->state != ALIVE || philo->table->death == TRUE)
+		if (!check_state(philo))
 			break ;
 	}
 	pthread_detach(philo->faucheuse_id);

@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:53:55 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/10 14:17:29 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/11 12:15:19 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,20 @@ t_bool launch(t_philo *philos)
 	return(TRUE);
 }
 
-static pthread_mutex_t init_fork_mutex(void)
+static t_bool init_philomut(pthread_mutex_t *mut1, pthread_mutex_t *mut2)
 {
-	pthread_mutex_t	fork_mutex;
+	pthread_mutex_t	mutex_1;
+	pthread_mutex_t	mutex_2;
 
-	if (pthread_mutex_init(&fork_mutex, NULL) != 0)
-		ft_putstr_fd("Error: fork mutex init failed\n", 2);
-	return (fork_mutex);
+	if (pthread_mutex_init(&mutex_1, NULL) != 0 ||
+		pthread_mutex_init(&mutex_2, NULL) != 0)
+	{
+		ft_putstr_fd("Error: philos mutexes initialisation failed\n", 2);
+		return (FALSE);
+	}
+	*mut1 = mutex_1;
+	*mut2 = mutex_2;
+	return (TRUE);
 }
 
 t_bool	init_philos(t_philo *philos, t_data *table)
@@ -74,7 +81,8 @@ t_bool	init_philos(t_philo *philos, t_data *table)
 	while (i < table->nb_philos)
 	{
 		philos[i].index = i + 1;
-		philos[i].left_fork = init_fork_mutex();
+		if (!init_philomut(&philos[i].left_fork, &philos[i].state_lock))
+			return (FALSE);
 		philos[i].table = table;
 		philos[i].nb_meals = 0;
 		philos[i].state = ALIVE;
