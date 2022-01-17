@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:09 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/10 19:49:34 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/17 17:25:23 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,26 @@ t_bool	check_args(int argc, char **argv)
 	return (TRUE);
 }
 
+static t_bool	init_mutexes_2(t_data *table)
+{
+	pthread_mutex_t	lock_3;
+
+	if (pthread_mutex_init(&lock_3, NULL) != 0)
+	{
+		pthread_mutex_destroy(&table->clock_lock);
+		pthread_mutex_destroy(&table->talk_lock);
+		pthread_mutex_destroy(&table->death_lock);
+		return (FALSE);
+	}
+	table->full_lock = lock_3;
+	return (TRUE);
+}
+
 static t_bool	init_mutexes(t_data *table)
 {
 	pthread_mutex_t	lock_0;
 	pthread_mutex_t	lock_1;
 	pthread_mutex_t	lock_2;
-	pthread_mutex_t	lock_3;
 
 	if (pthread_mutex_init(&lock_0, NULL) != 0)
 		return (FALSE);
@@ -58,23 +72,17 @@ static t_bool	init_mutexes(t_data *table)
 		pthread_mutex_destroy(&lock_1);
 		return (FALSE);
 	}
-	if (pthread_mutex_init(&lock_3, NULL) != 0)
-	{
-		pthread_mutex_destroy(&lock_0);
-		pthread_mutex_destroy(&lock_1);
-		pthread_mutex_destroy(&lock_2);
-		return (FALSE);
-	}
 	table->clock_lock = lock_0;
 	table->talk_lock = lock_1;
 	table->death_lock = lock_2;
-	table->full_lock = lock_3;
-	return (TRUE);
+	return (init_mutexes_2(table));
 }
 
 t_bool	init_table(char **argv, t_data *table)
 {
 	table->nb_philos = ft_atoi(argv[1]);
+	if (table->nb_philos < 1)
+		return (FALSE);
 	table->nb_philos_full = 0;
 	table->tt_die = ft_atoi(argv[2]);
 	table->tt_eat = ft_atoi(argv[3]);

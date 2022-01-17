@@ -6,7 +6,7 @@
 #    By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/09 15:00:41 by smagdela          #+#    #+#              #
-#    Updated: 2022/01/11 16:43:29 by smagdela         ###   ########.fr        #
+#    Updated: 2022/01/17 17:37:53 by smagdela         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ BONUSD	=	bonus/
 BONUSSD	=	${BONUSD}sources/
 BONUSOD	=	${BONUSD}objects/
 
-SRCS	=	main.c parsing.c philo.c utils.c utils_2.c maieutique.c 
+SRCS	=	main.c parsing.c philo.c activities.c utils.c utils_2.c maieutique.c 
 BONUS 	=
 OBJS	:=	${addprefix ${OBJD},${SRCS:.c=.o}}
 DEPS	:=	${addprefix ${OBJD},${SRCS:.c=.d}}
@@ -78,9 +78,6 @@ fclean:	clean
 	@echo ${NUKE}
 
 re:		fclean all
-
-norm:
-	norminette ${SRCS} ${BONUS} ${INCD}
 
 .PHONY : re all bonus clean fclean norm
 

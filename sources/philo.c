@@ -6,13 +6,13 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:35 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/11 17:20:34 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/17 18:24:22 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static t_bool	check_state(t_philo *philo)
+t_bool	check_state(t_philo *philo)
 {
 	t_bool	ret;
 
@@ -26,27 +26,7 @@ static t_bool	check_state(t_philo *philo)
 	return (ret);
 }
 
-static void	ft_wait(t_philo *philo, uint64_t time)
-{
-	uint64_t	tempus_fugit;
-
-	pthread_mutex_lock(&philo->table->clock_lock);
-	tempus_fugit = ft_clock();
-	pthread_mutex_unlock(&philo->table->clock_lock);
-	while (42)
-	{
-		pthread_mutex_lock(&philo->table->clock_lock);
-		if (ft_clock() - tempus_fugit >= time ||
-			check_state(philo) == FALSE)
-		{
-			pthread_mutex_unlock(&philo->table->clock_lock);
-			break ;
-		}
-		pthread_mutex_unlock(&philo->table->clock_lock);
-	}
-}
-
-static void	*faucheuse(void *info)
+void	*faucheuse(void *info)
 {
 	t_philo		*philo;
 	int			memento_mori;
@@ -63,112 +43,18 @@ static void	*faucheuse(void *info)
 	return (NULL);
 }
 
-void	*ft_philo(void *info)
+static void	*the_end(t_philo *philo)
 {
-	t_philo		*philo;
-	pthread_t	thread;
-
-	philo = (t_philo *)info;
-	pthread_create(&thread, NULL, &faucheuse, philo);
-	philo->faucheuse_id = thread;
-	while (42)
-	{
-		pthread_mutex_lock(&philo->left_fork);
-		if (!check_state(philo))
-		{
-			pthread_mutex_unlock(&philo->left_fork);
-			break ;
-		}
-
-		ft_blabla(philo, "has taken left fork.");
-		if (!check_state(philo))
-		{
-			pthread_mutex_unlock(&philo->left_fork);
-			break ;
-		}
-
-		if (philo->right_fork == NULL)
-		{
-			ft_wait(philo, philo->table->tt_die * 2);
-			pthread_mutex_unlock(&philo->left_fork);
-			break ;
-		}
-		pthread_mutex_lock(philo->right_fork);
-		if (!check_state(philo))
-		{
-			pthread_mutex_unlock(&philo->left_fork);
-			pthread_mutex_unlock(philo->right_fork);
-			break ;
-		}
-
-		ft_blabla(philo, "has taken right fork.");
-		if (!check_state(philo))
-		{
-			pthread_mutex_unlock(&philo->left_fork);
-			pthread_mutex_unlock(philo->right_fork);
-			break ;
-		}
-
-		ft_blabla(philo, "is eating.");
-		pthread_detach(philo->faucheuse_id);
-		philo->nb_meals += 1;
-		pthread_create(&philo->faucheuse_id, NULL, &faucheuse, philo);
-		ft_wait(philo, philo->table->tt_eat);
-		if (!check_state(philo))
-		{
-			pthread_mutex_unlock(&philo->left_fork);
-			pthread_mutex_unlock(philo->right_fork);
-			break ;
-		}
-
-		if (philo->nb_meals == philo->table->full)
-		{
-			pthread_mutex_unlock(&philo->left_fork);
-			pthread_mutex_unlock(philo->right_fork);
-			pthread_detach(philo->faucheuse_id);
-			pthread_mutex_lock(&philo->table->full_lock);
-			philo->table->nb_philos_full += 1;
-			pthread_mutex_unlock(&philo->table->full_lock);
-			philo->state = FULL;
-			break ;
-		}
-
-		ft_blabla(philo, "is sleeping.");
-		if (!check_state(philo))
-		{
-			pthread_mutex_unlock(&philo->left_fork);
-			pthread_mutex_unlock(philo->right_fork);
-			break ;
-		}
-
-		pthread_mutex_unlock(&philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
-
-		ft_wait(philo, philo->table->tt_sleep);
-		if (!check_state(philo))
-			break ;
-
-		ft_blabla(philo, "is thinking.");
-		if (!check_state(philo))
-			break ;
-	}
-	pthread_detach(philo->faucheuse_id);
 	pthread_mutex_lock(&philo->table->death_lock);
 	pthread_mutex_lock(&philo->state_lock);
 	if (philo->table->death == FALSE && philo->state == DEAD)
 	{
 		pthread_mutex_unlock(&philo->table->death_lock);
 		pthread_mutex_unlock(&philo->state_lock);
-		ft_blabla(philo, "is dead.");
+		ft_blabla(philo, "died.");
 		pthread_mutex_lock(&philo->table->death_lock);
 		philo->table->death = TRUE;
 		pthread_mutex_unlock(&philo->table->death_lock);
-	}
-	else if (philo->state == FULL)
-	{
-		pthread_mutex_unlock(&philo->table->death_lock);
-		pthread_mutex_unlock(&philo->state_lock);
-		ft_blabla(philo, "has finished.");
 	}
 	else
 	{
@@ -176,4 +62,32 @@ void	*ft_philo(void *info)
 		pthread_mutex_unlock(&philo->state_lock);
 	}
 	return (philo);
+}
+
+void	*ft_philo(void *info)
+{
+	t_philo		*philo;
+
+	philo = (t_philo *)info;
+	pthread_create(&philo->faucheuse_id, NULL, &faucheuse, philo);
+	while (42)
+	{
+		if (philo->index % 2)
+		{
+			if (to_eat_odd(philo) == FALSE)
+				break ;
+		}
+		else
+		{
+			if (to_eat_even(philo) == FALSE)
+				break ;
+		}
+		pthread_detach(philo->faucheuse_id);
+		philo->nb_meals += 1;
+		pthread_create(&philo->faucheuse_id, NULL, &faucheuse, philo);
+		if (to_think(philo) == FALSE)
+			break ;
+	}
+	pthread_detach(philo->faucheuse_id);
+	return (the_end(philo));
 }
