@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/17 17:51:12 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 15:31:34 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,28 +37,47 @@ int	clean(t_philo *philos, t_data *table)
 	return (1);
 }
 
-static void	vulture(t_philo *philos)
+static t_bool	vulture(t_philo *philos)
 {
-	while (42)
+	size_t	i;
+
+	i = 0;
+	while(i < philos->table->nb_philos)
 	{
-		pthread_mutex_lock(&philos->table->death_lock);
+		pthread_mutex_lock(&philos->table->clock_lock);
 		pthread_mutex_lock(&philos->table->full_lock);
-		if (philos->table->death == FALSE
-			&& philos->table->nb_philos_full < philos->table->nb_philos)
-			break ;
-		pthread_mutex_unlock(&philos->table->death_lock);
+		pthread_mutex_lock(&philos[i].state_lock);
+		if (ft_clock() - philos[i].last_meal >= philos->table->tt_die)
+		{
+			pthread_mutex_unlock(&philos->table->clock_lock);
+			philos[i].state = DEAD;
+			pthread_mutex_unlock(&philos[i].state_lock);
+/*			pthread_mutex_lock(&philos->table->death_lock);
+			philos->table->death = TRUE;
+			pthread_mutex_unlock(&philos->table->death_lock);
+*/			return (DEAD);
+		}
+		else if (philos->table->nb_philos_full >= philos->table->nb_philos)
+		{
+			pthread_mutex_unlock(&philos->table->full_lock);
+			return (FULL);
+		}
+		pthread_mutex_unlock(&philos->table->clock_lock);
 		pthread_mutex_unlock(&philos->table->full_lock);
-		usleep(500);
+		pthread_mutex_unlock(&philos[i].state_lock);
+		++i;
 	}
-	pthread_mutex_unlock(&philos->table->death_lock);
-	pthread_mutex_unlock(&philos->table->full_lock);
+	return (ALIVE);
 }
 
 static int	wait_end(t_philo *philos)
 {
 	size_t	i;
 
-	vulture(philos);
+	while (vulture(philos) == ALIVE)
+	{
+		usleep(250);
+	}
 	i = 0;
 	while (i < philos->table->nb_philos)
 	{
@@ -67,7 +86,7 @@ static int	wait_end(t_philo *philos)
 	}
 	if (philos->table->death == TRUE)
 		return (DEAD * clean(philos, philos->table));
-	else if (philos->table->nb_philos_full == philos->table->nb_philos)
+	else if (philos->table->nb_philos_full >= philos->table->nb_philos)
 		return (0 * clean(philos, philos->table));
 	return (42 * clean(philos, philos->table));
 }

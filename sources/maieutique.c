@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:53:55 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/17 18:25:16 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 15:30:01 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 static t_bool	philo_birth(t_philo *philo)
 {
 	pthread_t	thread_philo;
-	pthread_t	thread_faucheuse;
 
+	pthread_mutex_lock(&philo->state_lock);
+	philo->last_meal = philo->table->clock_start;
+	pthread_mutex_unlock(&philo->state_lock);
 	if (pthread_create(&thread_philo, NULL, &ft_philo, philo) != 0)
 	{
 		pthread_mutex_lock(&philo->table->death_lock);
@@ -25,14 +27,6 @@ static t_bool	philo_birth(t_philo *philo)
 		return (FALSE);
 	}
 	philo->thread_id = thread_philo;
-	if (pthread_create(&thread_faucheuse, NULL, &faucheuse, philo) != 0)
-	{
-		pthread_mutex_lock(&philo->table->death_lock);
-		philo->table->death = TRUE;
-		pthread_mutex_unlock(&philo->table->death_lock);
-		return (FALSE);
-	}
-	philo->faucheuse_id = thread_faucheuse;
 	return (TRUE);
 }
 
@@ -43,7 +37,9 @@ t_bool	launch(t_philo *philos)
 	if (philos == NULL)
 		return (FALSE);
 	i = 0;
+	pthread_mutex_lock(&philos->table->clock_lock);
 	philos->table->clock_start = ft_clock();
+	pthread_mutex_unlock(&philos->table->clock_lock);
 	while (i < philos->table->nb_philos)
 	{
 		if (philo_birth(&philos[i]) == FALSE)
@@ -53,7 +49,7 @@ t_bool	launch(t_philo *philos)
 	if (philos->table->nb_philos <= 1)
 		return (TRUE);
 	i = 1;
-	usleep(500);
+	usleep(200);
 	while (i < philos->table->nb_philos)
 	{
 		if (philo_birth(&philos[i]) == FALSE)

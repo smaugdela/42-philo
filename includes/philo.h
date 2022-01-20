@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:12 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/17 18:24:39 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 14:32:27 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,30 +33,30 @@ typedef uint8_t	t_bool;
 typedef struct s_data
 {
 	size_t			nb_philos;
-	size_t			nb_philos_full;
 	size_t			tt_die;
 	size_t			tt_eat;
 	size_t			tt_sleep;
-	int				full;
-	t_bool			death;
-	uint64_t		clock_start;
 	pthread_mutex_t	clock_lock;
-	pthread_mutex_t	talk_lock;
+	uint64_t		clock_start;
 	pthread_mutex_t	death_lock;
+	t_bool			death;
 	pthread_mutex_t	full_lock;
+	size_t			nb_philos_full;
+	int				full;
+	pthread_mutex_t	talk_lock;
 }	t_data;
 
 typedef struct s_philo
 {
 	size_t			index;
 	pthread_t		thread_id;
-	pthread_t		faucheuse_id;
 	pthread_mutex_t	left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*table;
-	int				nb_meals;
 	pthread_mutex_t	state_lock;
+	int				nb_meals;
 	t_bool			state;
+	uint64_t		last_meal;
 }	t_philo;
 
 /* Utilities Functions */

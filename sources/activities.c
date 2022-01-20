@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 17:37:21 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/17 18:22:41 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 14:54:16 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ t_bool	to_eat_odd(t_philo *philo)
 
 static t_bool	to_sleep(t_philo *philo)
 {
-	ft_wait(philo, philo->table->tt_eat);
 	if (!check_state(philo))
 	{
 		pthread_mutex_unlock(&philo->left_fork);
@@ -99,7 +98,6 @@ static t_bool	to_sleep(t_philo *philo)
 	{
 		pthread_mutex_unlock(&philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
-		pthread_detach(philo->faucheuse_id);
 		pthread_mutex_lock(&philo->table->full_lock);
 		philo->table->nb_philos_full += 1;
 		pthread_mutex_unlock(&philo->table->full_lock);
@@ -114,14 +112,10 @@ t_bool	to_think(t_philo *philo)
 {
 	if (to_sleep(philo) == FALSE)
 		return (FALSE);
-	if (!check_state(philo))
-	{
-		pthread_mutex_unlock(&philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
-		return (FALSE);
-	}
 	pthread_mutex_unlock(&philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
+	if (!check_state(philo))
+		return (FALSE);
 	ft_wait(philo, philo->table->tt_sleep);
 	if (!check_state(philo))
 		return (FALSE);
