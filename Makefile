@@ -6,7 +6,7 @@
 #    By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/09 15:00:41 by smagdela          #+#    #+#              #
-#    Updated: 2022/01/17 17:37:53 by smagdela         ###   ########.fr        #
+#    Updated: 2022/01/20 17:21:08 by smagdela         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,15 +60,15 @@ ${OBJD}%.o:	${SRCD}%.c
 	mkdir -p ${OBJD}
 	${CC} ${CFLAGS} -c -o $@ -I${INCD} -g -MMD $<
 
-bonus:	${NAME}_bonus
-
-${NAME}_bonus :  ${BONUSO}
-	${CC} -pthread ${CFLAGS} ${BONUSO} -o ${NAME}_bonus
-	@echo ${WHALE}
-
-${BONUSOD}%.o:	${BONUSSD}%.c
-	mkdir -p ${BONUSOD}
-	${CC} ${CFLAGS} -c -o $@ -I${INCD} -MMD $<
+#bonus:	${NAME}_bonus
+#
+#${NAME}_bonus :  ${BONUSO}
+#	${CC} -pthread ${CFLAGS} ${BONUSO} -o ${NAME}_bonus
+#	@echo ${WHALE}
+#
+#${BONUSOD}%.o:	${BONUSSD}%.c
+#	mkdir -p ${BONUSOD}
+#	${CC} ${CFLAGS} -c -o $@ -I${INCD} -MMD $<
 
 clean:
 	-rm -rf ${OBJD} ${BONUSOD} ${DEPD}
@@ -79,6 +79,6 @@ fclean:	clean
 
 re:		fclean all
 
-.PHONY : re all bonus clean fclean norm
+.PHONY : re all bonus clean fclean
 
 -include ${DEPS}

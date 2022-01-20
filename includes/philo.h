@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:12 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/20 14:32:27 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 17:21:47 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,10 @@ typedef struct s_philo
 {
 	size_t			index;
 	pthread_t		thread_id;
-	pthread_mutex_t	left_fork;
+	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*table;
-	pthread_mutex_t	state_lock;
+	pthread_mutex_t	*state_lock;
 	int				nb_meals;
 	t_bool			state;
 	uint64_t		last_meal;

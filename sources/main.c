@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/20 15:31:34 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 17:58:17 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,18 @@ int	clean(t_philo *philos, t_data *table)
 	if (philos != NULL)
 	{
 		i = 0;
-		while (i < philos->table->nb_philos)
+		while (i < philos->table->nb_philos && &philos[i] != NULL)
 		{
-			pthread_mutex_destroy(&philos[i].left_fork);
-			pthread_mutex_destroy(&philos[i].state_lock);
+			if (philos[i].left_fork != NULL)
+			{
+				pthread_mutex_destroy(philos[i].left_fork);
+				free(philos[i].left_fork);
+			}
+			if (philos[i].state_lock != NULL)
+			{
+				pthread_mutex_destroy(philos[i].state_lock);
+				free(philos[i].state_lock);
+			}
 			++i;
 		}
 		free(philos);
@@ -46,16 +54,14 @@ static t_bool	vulture(t_philo *philos)
 	{
 		pthread_mutex_lock(&philos->table->clock_lock);
 		pthread_mutex_lock(&philos->table->full_lock);
-		pthread_mutex_lock(&philos[i].state_lock);
+		pthread_mutex_lock(philos[i].state_lock);
 		if (ft_clock() - philos[i].last_meal >= philos->table->tt_die)
 		{
-			pthread_mutex_unlock(&philos->table->clock_lock);
 			philos[i].state = DEAD;
-			pthread_mutex_unlock(&philos[i].state_lock);
-/*			pthread_mutex_lock(&philos->table->death_lock);
-			philos->table->death = TRUE;
-			pthread_mutex_unlock(&philos->table->death_lock);
-*/			return (DEAD);
+			pthread_mutex_unlock(philos[i].state_lock);
+			pthread_mutex_unlock(&philos->table->clock_lock);
+			pthread_mutex_unlock(&philos->table->full_lock);
+			return (DEAD);
 		}
 		else if (philos->table->nb_philos_full >= philos->table->nb_philos)
 		{
@@ -64,7 +70,7 @@ static t_bool	vulture(t_philo *philos)
 		}
 		pthread_mutex_unlock(&philos->table->clock_lock);
 		pthread_mutex_unlock(&philos->table->full_lock);
-		pthread_mutex_unlock(&philos[i].state_lock);
+		pthread_mutex_unlock(philos[i].state_lock);
 		++i;
 	}
 	return (ALIVE);

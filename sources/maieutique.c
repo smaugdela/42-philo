@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:53:55 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/20 15:30:01 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 17:50:06 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ static t_bool	philo_birth(t_philo *philo)
 {
 	pthread_t	thread_philo;
 
-	pthread_mutex_lock(&philo->state_lock);
+	pthread_mutex_lock(philo->state_lock);
 	philo->last_meal = philo->table->clock_start;
-	pthread_mutex_unlock(&philo->state_lock);
+	pthread_mutex_unlock(philo->state_lock);
 	if (pthread_create(&thread_philo, NULL, &ft_philo, philo) != 0)
 	{
 		pthread_mutex_lock(&philo->table->death_lock);
@@ -59,24 +59,41 @@ t_bool	launch(t_philo *philos)
 	return (TRUE);
 }
 
-static t_bool	init_philomut(pthread_mutex_t *mut1, pthread_mutex_t *mut2)
+static t_bool	init_philomut(t_philo *philo)
 {
-	pthread_mutex_t	mutex_1;
-	pthread_mutex_t	mutex_2;
+	pthread_mutex_t	*mutex_1;
+	pthread_mutex_t	*mutex_2;
 
-	if (pthread_mutex_init(&mutex_1, NULL) != 0)
+	mutex_1 = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	if (mutex_1 == NULL)
 	{
+		ft_putstr_fd("Error: philos mutexes malloc failed\n", 2);
+		return (FALSE);
+	}
+	mutex_2 = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	if (mutex_2 == NULL)
+	{
+		free(mutex_1);
+		ft_putstr_fd("Error: philos mutexes malloc failed\n", 2);
+		return (FALSE);
+	}
+	if (pthread_mutex_init(mutex_1, NULL) != 0)
+	{
+		free(mutex_1);
+		free(mutex_2);
 		ft_putstr_fd("Error: philos mutexes initialisation failed\n", 2);
 		return (FALSE);
 	}
-	if (pthread_mutex_init(&mutex_2, NULL) != 0)
+	if (pthread_mutex_init(mutex_2, NULL) != 0)
 	{
-		pthread_mutex_destroy(&mutex_1);
+		free(mutex_1);
+		free(mutex_2);
+		pthread_mutex_destroy(mutex_1);
 		ft_putstr_fd("Error: philos mutexes initialisation failed\n", 2);
 		return (FALSE);
 	}
-	*mut1 = mutex_1;
-	*mut2 = mutex_2;
+	philo->left_fork = mutex_1;
+	philo->state_lock = mutex_2;
 	return (TRUE);
 }
 
@@ -92,7 +109,7 @@ static t_bool	link_forks(t_philo *philos, t_data *table)
 	i = 0;
 	while (i < table->nb_philos)
 	{
-		philos[i].right_fork = &philos[(i + 1) % table->nb_philos].left_fork;
+		philos[i].right_fork = philos[(i + 1) % table->nb_philos].left_fork;
 		if (philos[i].right_fork == NULL)
 			return (FALSE);
 		++i;
@@ -110,7 +127,7 @@ t_bool	init_philos(t_philo *philos, t_data *table)
 	while (i < table->nb_philos)
 	{
 		philos[i].index = i + 1;
-		if (!init_philomut(&philos[i].left_fork, &philos[i].state_lock))
+		if (!init_philomut(&philos[i]))
 			return (FALSE);
 		philos[i].table = table;
 		philos[i].nb_meals = 0;

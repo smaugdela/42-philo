@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:35 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/20 14:56:57 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/20 17:23:31 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,22 +18,22 @@ t_bool	check_state(t_philo *philo)
 
 	ret = TRUE;
 	pthread_mutex_lock(&philo->table->death_lock);
-	pthread_mutex_lock(&philo->state_lock);
+	pthread_mutex_lock(philo->state_lock);
 	if (philo->state != ALIVE || philo->table->death == TRUE)
 		ret = FALSE;
 	pthread_mutex_unlock(&philo->table->death_lock);
-	pthread_mutex_unlock(&philo->state_lock);
+	pthread_mutex_unlock(philo->state_lock);
 	return (ret);
 }
 
 static void	*the_end(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->table->death_lock);
-	pthread_mutex_lock(&philo->state_lock);
+	pthread_mutex_lock(philo->state_lock);
 	if (philo->table->death == FALSE && philo->state == DEAD)
 	{
 		pthread_mutex_unlock(&philo->table->death_lock);
-		pthread_mutex_unlock(&philo->state_lock);
+		pthread_mutex_unlock(philo->state_lock);
 		ft_blabla(philo, "died.");
 		pthread_mutex_lock(&philo->table->death_lock);
 		philo->table->death = TRUE;
@@ -42,7 +42,7 @@ static void	*the_end(t_philo *philo)
 	else
 	{
 		pthread_mutex_unlock(&philo->table->death_lock);
-		pthread_mutex_unlock(&philo->state_lock);
+		pthread_mutex_unlock(philo->state_lock);
 	}
 	return (philo);
 }
@@ -50,11 +50,11 @@ static void	*the_end(t_philo *philo)
 static void	eating(t_philo *philo)
 {		
 	pthread_mutex_lock(&philo->table->clock_lock);
-	pthread_mutex_lock(&philo->state_lock);
+	pthread_mutex_lock(philo->state_lock);
 	philo->last_meal = ft_clock();
 	philo->nb_meals += 1;
 	pthread_mutex_unlock(&philo->table->clock_lock);
-	pthread_mutex_unlock(&philo->state_lock);
+	pthread_mutex_unlock(philo->state_lock);
 	ft_wait(philo, philo->table->tt_eat);
 }
 
