@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:12 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/20 17:21:47 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/24 19:56:28 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef uint8_t	t_bool;
 # define FALSE 0
 
 # define ALIVE 0
-# define FULL 1
+# define TERM 1
 # define DEAD 2
 
 typedef struct s_data
@@ -66,7 +66,6 @@ int				ft_atoi(const char *str);
 int				ft_isdigit(int c);
 t_bool			ft_is_str_digits(const char *str);
 t_bool			ft_checkposint(char *nb);
-size_t			ft_min(size_t a, size_t b);
 
 /* Parsing */
 t_bool			check_args(int argc, char **argv);
@@ -76,10 +75,10 @@ t_bool			init_philos(t_philo *philos, t_data *table);
 /* Execution */
 t_bool			launch(t_philo *philos);
 void			*ft_philo(void *table);
-void			*faucheuse(void *info);
 t_bool			check_state(t_philo *philo);
 t_bool			to_eat_even(t_philo *philo);
 t_bool			to_eat_odd(t_philo *philo);
+t_bool			eating(t_philo *philo);
 t_bool			to_think(t_philo *philo);
 void			ft_wait(t_philo *philo, uint64_t time);
 int				clean(t_philo *philos, t_data *table);

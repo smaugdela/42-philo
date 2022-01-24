@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:53:55 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/20 17:50:06 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/24 19:19:55 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,10 +126,10 @@ t_bool	init_philos(t_philo *philos, t_data *table)
 	i = 0;
 	while (i < table->nb_philos)
 	{
+		philos[i].table = table;
 		philos[i].index = i + 1;
 		if (!init_philomut(&philos[i]))
 			return (FALSE);
-		philos[i].table = table;
 		philos[i].nb_meals = 0;
 		philos[i].state = ALIVE;
 		++i;
