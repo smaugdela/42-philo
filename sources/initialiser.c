@@ -6,52 +6,42 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 17:14:23 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/25 17:16:39 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/25 18:08:05 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static t_bool	malloc_philomut(t_philo *philo)
+static pthread_mutex_t	*create_mutex(void)
 {
-	
+	pthread_mutex_t	*mutex;
+
+	mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	if (mutex == NULL)
+	{
+		ft_putstr_fd("Error: philos mutexes malloc failed\n", 2);
+		return (NULL);
+	}
+	if (pthread_mutex_init(mutex, NULL) != 0)
+	{
+		free(mutex);
+		ft_putstr_fd("Error: philos mutexes initialisation failed\n", 2);
+		return (NULL);
+	}
+	return (mutex);
 }
 
 static t_bool	init_philomut(t_philo *philo)
 {
-	pthread_mutex_t	*mutex_1;
-	pthread_mutex_t	*mutex_2;
-
-	mutex_1 = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
-	if (mutex_1 == NULL)
+	philo->left_fork = create_mutex();
+	if (philo->left_fork == NULL)
+		return (FALSE);
+	philo->state_lock = create_mutex();
+	if (philo->state_lock == NULL)
 	{
-		ft_putstr_fd("Error: philos mutexes malloc failed\n", 2);
+		free(philo->left_fork);
 		return (FALSE);
 	}
-	mutex_2 = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
-	if (mutex_2 == NULL)
-	{
-		free(mutex_1);
-		ft_putstr_fd("Error: philos mutexes malloc failed\n", 2);
-		return (FALSE);
-	}
-	if (pthread_mutex_init(mutex_1, NULL) != 0)
-	{
-		free(mutex_1);
-		free(mutex_2);
-		ft_putstr_fd("Error: philos mutexes initialisation failed\n", 2);
-		return (FALSE);
-	}
-	if (pthread_mutex_init(mutex_2, NULL) != 0)
-	{
-		free(mutex_1);
-		free(mutex_2);
-		pthread_mutex_destroy(mutex_1);
-		ft_putstr_fd("Error: philos mutexes initialisation failed\n", 2);
-		return (FALSE);
-	}
-	philo->left_fork = mutex_1;
-	philo->state_lock = mutex_2;
 	return (TRUE);
 }
 
