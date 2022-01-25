@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/24 20:08:47 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/25 15:54:18 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,34 +47,33 @@ static t_bool	vulture(t_philo *philos)
 	size_t	i;
 
 	i = 0;
+	pthread_mutex_lock(&philos->table->clock_lock);
+	pthread_mutex_lock(&philos->table->full_lock);
 	while (i < philos->table->nb_philos)
 	{
-		pthread_mutex_lock(&philos->table->clock_lock);
 		pthread_mutex_lock(philos[i].state_lock);
-		pthread_mutex_lock(&philos->table->full_lock);
-		if (ft_clock() - philos[i].last_meal >= philos->table->tt_die)
+		if (philos[i].state == TERM)
+			philos->table->nb_philos_full += 1;
+		else if (ft_clock() - philos[i].last_meal >= philos->table->tt_die)
 		{
-			pthread_mutex_unlock(&philos->table->clock_lock);
 			philos[i].state = DEAD;
 			pthread_mutex_unlock(philos[i].state_lock);
+			pthread_mutex_unlock(&philos->table->clock_lock);
 			pthread_mutex_unlock(&philos->table->full_lock);
-			printf("Burying\n");
 			return (DEAD);
 		}
-		else if (philos[i].state == TERM)
-			philos->table->nb_philos_full += 1;
 		if (philos->table->nb_philos_full >= philos->table->nb_philos)
 		{
-			pthread_mutex_unlock(&philos->table->full_lock);
 			pthread_mutex_unlock(philos[i].state_lock);
-			printf("Terminating\n");
+			pthread_mutex_unlock(&philos->table->clock_lock);
+			pthread_mutex_unlock(&philos->table->full_lock);
 			return (TERM);
 		}
-		pthread_mutex_unlock(&philos->table->clock_lock);
 		pthread_mutex_unlock(philos[i].state_lock);
-		pthread_mutex_unlock(&philos->table->full_lock);
 		++i;
 	}
+	pthread_mutex_unlock(&philos->table->clock_lock);
+	pthread_mutex_unlock(&philos->table->full_lock);
 	return (ALIVE);
 }
 
@@ -83,30 +82,23 @@ static int	wait_end(t_philo *philos)
 	size_t	i;
 
 	while (vulture(philos) == ALIVE)
-		usleep(250);
+		usleep(500);
 	i = 0;
 	while (i < philos->table->nb_philos)
 	{
 		pthread_mutex_lock(philos[i].state_lock);
-		if (philos[i].state != DEAD)
+		if (philos[i].state == ALIVE)
 			philos[i].state = TERM;
-		else
-		{
-			pthread_mutex_lock(&philos->table->death_lock);
-			philos->table->death = TRUE;
-			pthread_mutex_unlock(&philos->table->death_lock);
-		}
 		pthread_mutex_unlock(philos[i].state_lock);
 		++i;
 	}
 	i = 0;
 	while (i < philos->table->nb_philos)
 	{
+
 		pthread_join(philos[i].thread_id, NULL);
-		printf("Joined %lu\n", i + 1);
 		++i;
 	}
-	printf("Cleaning\n");
 	if (philos->table->death == TRUE
 		|| philos->table->nb_philos_full >= philos->table->nb_philos)
 		return (0 * clean(philos, philos->table));
