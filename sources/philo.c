@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 16:38:35 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/25 17:11:21 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/25 19:30:23 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,6 @@ t_bool	check_state(t_philo *philo)
 
 static void	life(t_philo *philo)
 {
-	pthread_mutex_lock(philo->state_lock);
-	if (philo->nb_meals == philo->table->full)
-		philo->state = TERM;
-	pthread_mutex_unlock(philo->state_lock);
 	while (check_state(philo))
 	{
 		if (philo->index % 2)
@@ -54,6 +50,10 @@ void	*ft_philo(void *info)
 	t_philo		*philo;
 
 	philo = (t_philo *)info;
+	pthread_mutex_lock(philo->state_lock);
+	if (philo->nb_meals == philo->table->full)
+		philo->state = FULL;
+	pthread_mutex_unlock(philo->state_lock);
 	life(philo);
 	pthread_mutex_lock(philo->state_lock);
 	if (philo->state == DEAD)

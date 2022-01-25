@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 17:37:21 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/25 16:36:45 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/25 19:31:15 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ t_bool	to_eat_even(t_philo *philo)
 		pthread_mutex_unlock(philo->right_fork);
 		return (FALSE);
 	}
-	ft_blabla(philo, "is eating.");
 	return (TRUE);
 }
 
@@ -82,7 +81,6 @@ t_bool	to_eat_odd(t_philo *philo)
 		pthread_mutex_unlock(philo->right_fork);
 		return (FALSE);
 	}
-	ft_blabla(philo, "is eating.");
 	return (TRUE);
 }
 
@@ -94,18 +92,13 @@ t_bool	eating(t_philo *philo)
 		pthread_mutex_unlock(philo->right_fork);
 		return (FALSE);
 	}
-	pthread_mutex_lock(&philo->table->clock_lock);
+	ft_blabla(philo, "is eating.");
 	pthread_mutex_lock(philo->state_lock);
-	philo->last_meal = ft_clock();
 	philo->nb_meals += 1;
-	pthread_mutex_unlock(&philo->table->clock_lock);
 	pthread_mutex_unlock(philo->state_lock);
-	if (!check_state(philo))
-	{
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
-		return (FALSE);
-	}
+	pthread_mutex_lock(&philo->table->clock_lock);
+	philo->last_meal = ft_clock();
+	pthread_mutex_unlock(&philo->table->clock_lock);
 	ft_wait(philo, philo->table->tt_eat);
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
@@ -122,7 +115,7 @@ t_bool	to_think(t_philo *philo)
 	pthread_mutex_lock(philo->state_lock);
 	if (philo->nb_meals == philo->table->full)
 	{
-		philo->state = TERM;
+		philo->state = FULL;
 		pthread_mutex_unlock(philo->state_lock);
 		pthread_mutex_unlock(&philo->table->full_lock);
 		return (FALSE);

@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:12 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/25 14:11:56 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/25 19:26:33 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef uint8_t	t_bool;
 # define ALIVE 0
 # define TERM 1
 # define DEAD 2
+# define FULL 3
 
 typedef struct s_data
 {
