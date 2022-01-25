@@ -6,7 +6,7 @@
 #    By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/09 15:00:41 by smagdela          #+#    #+#              #
-#    Updated: 2022/01/25 16:39:58 by smagdela         ###   ########.fr        #
+#    Updated: 2022/01/25 17:15:33 by smagdela         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ BONUSD	=	bonus/
 BONUSSD	=	${BONUSD}sources/
 BONUSOD	=	${BONUSD}objects/
 
-SRCS	=	main.c parsing.c philo.c activities.c utils.c utils_2.c maieutique.c 
+SRCS	=	main.c parsing.c philo.c activities.c utils.c utils_2.c maieutique.c initialiser.c
 BONUS 	=
 OBJS	:=	${addprefix ${OBJD},${SRCS:.c=.o}}
 DEPS	:=	${addprefix ${OBJD},${SRCS:.c=.d}}

@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 13:07:05 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/25 13:52:14 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/25 17:01:28 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,39 @@ void	ft_blabla(t_philo *info, const char *str)
 	pthread_mutex_unlock(&info->table->death_lock);
 	pthread_mutex_unlock(&info->table->talk_lock);
 	pthread_mutex_unlock(&info->table->clock_lock);
+}
+
+static void	destroy_mutexes(t_data *table)
+{
+	pthread_mutex_destroy(&table->clock_lock);
+	pthread_mutex_destroy(&table->talk_lock);
+	pthread_mutex_destroy(&table->death_lock);
+	pthread_mutex_destroy(&table->full_lock);
+}
+
+int	clean(t_philo *philos, t_data *table)
+{
+	size_t	i;
+
+	destroy_mutexes(table);
+	if (philos != NULL)
+	{
+		i = 0;
+		while (i < table->nb_philos && &philos[i] != NULL)
+		{
+			if (philos[i].left_fork != NULL)
+			{
+				pthread_mutex_destroy(philos[i].left_fork);
+				free(philos[i].left_fork);
+			}
+			if (philos[i].state_lock != NULL)
+			{
+				pthread_mutex_destroy(philos[i].state_lock);
+				free(philos[i].state_lock);
+			}
+			++i;
+		}
+		free(philos);
+	}
+	return (1);
 }
