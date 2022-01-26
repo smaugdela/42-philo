@@ -6,7 +6,7 @@
 /*   By: smagdela <smagdela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/03 13:32:14 by smagdela          #+#    #+#             */
-/*   Updated: 2022/01/25 19:32:27 by smagdela         ###   ########.fr       */
+/*   Updated: 2022/01/26 12:07:43 by smagdela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,7 @@ static t_bool	check_philo(t_philo	*philo)
 	if (philo->state == FULL)
 	{
 		philo->table->nb_philos_full += 1;
-		pthread_mutex_lock(philo->state_lock);
 		philo->state = TERM;
-		pthread_mutex_unlock(philo->state_lock);
 	}
 	else if (ft_clock() - philo->last_meal >= philo->table->tt_die)
 	{
@@ -27,12 +25,7 @@ static t_bool	check_philo(t_philo	*philo)
 		return (DEAD);
 	}
 	if (philo->table->nb_philos_full == philo->table->nb_philos)
-	{
-		pthread_mutex_lock(&philo->table->talk_lock);
-		printf("Everyone is full\n");
-		pthread_mutex_unlock(&philo->table->talk_lock);
 		return (TERM);
-	}
 	return (ALIVE);
 }
 
